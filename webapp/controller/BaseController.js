@@ -3,13 +3,17 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "com/btc/zwmtuketimhareketleri/model/models",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageBox",
+    "sap/m/MessageToast"
 ], function (
     ManagedObject,
     Controller,
     models,
     Filter,
-    FilterOperator
+    FilterOperator,
+    MessageBox,
+    MessageToast
 ) {
     "use strict";
 
@@ -114,27 +118,138 @@ sap.ui.define([
         },
 
         _getKaynakDepoAdresi: function () {
-
+            let that = this;
+            this._readMultiData("/KaynakDepoSHSet", [], this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/KaynakDepoAdresiSH", oData.results);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
         },
 
-        _checkBrcode: function (sBarkoce) {
-            this._checkStock();
+        _getItems: function () {
+            let that = this,
+                aFilters = [
+                    new Filter("IvKlgpla", FilterOperator.EQ, this._jsonModel.getData().Header.KaynakDepoAdresi)
+                ];
+
+            this._readMultiData("/KalemGetirSet", aFilters, this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/TransferTablosu", oData.results)
+            }).catch((oError) => {
+                MessageToast.show(JSON.parse(oError.responseText).error.message.value)
+                that._jsonModel.setProperty("/TransferTablosu", [])
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide()
+            })
         },
 
-        _checkStock: function () {
+        _checkBrcode: function (sBarcode, oKaynakDepo, oLgtyp) {
+            let that = this,
+                sPath = this._oDataModel.createKey("/BarkodOkutSet", {
+                    IvBarkod: sBarcode,
+                    IvKlgpla: oKaynakDepo,
+                    IvLgtyp: oLgtyp
+                });
 
+            this._readData(sPath, this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/Header/Barkod", oData.IvBarkod)
+                that._jsonModel.setProperty("/Header/Matnr", oData.EvMatnr)
+                that._jsonModel.setProperty("/Header/Maktx", oData.EvMaktx)
+                that._jsonModel.setProperty("/Header/Charg", oData.EvCharg)
+                that._jsonModel.setProperty("/Header/Pyp", oData.EvPyp)
+                that._jsonModel.setProperty("/Xchpf", oData.EvXchpf)
+                that._jsonModel.setProperty("/Header/StokBilgi", oData.EvVerme)
+                that._jsonModel.setProperty("/Header/Meins", oData.EvMeins)
+
+            }).catch((oError) => {
+                this._jsonModel.setProperty("/Header/Barkod", "")
+                this._focusInput("idBarkodInput", 200)
+                MessageBox.error(JSON.parse(oError.responseText).error.message.value)
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide()
+            })
         },
 
         _addBarcode: function (oHeaderData) {
+            let that = this,
+                sPath = this._oDataModel.createKey("/BarkodEkleSet", {
+                    Werks: "",
+                    Lgort: "",
+                    Lgpla: oHeaderData.KaynakDepoAdresi,
+                    Lgtyp: this._jsonModel.getData().Lgtyp,
+                    Matnr: oHeaderData.Matnr,
+                    Maktx: oHeaderData.Maktx,
+                    Charg: oHeaderData.Charg,
+                    PsPspnr: oHeaderData.Pyp_MasrafYeri,
+                    Kostl: oHeaderData.Pyp_MasrafYeri,
+                    Verme: oHeaderData.StokBilgi,
+                    Menge: oHeaderData.Menge,
+                    Meins: oHeaderData.Meins,
+                    Bwart: "",
+                }),
+                sHareketTuru = this._jsonModel.getData().Header.HareketTuru,
+                sHareketTuruTanim = this._jsonModel.getData().Header.HareketTuruTanim,
+                oKaynakDepo = oHeaderData.KaynakDepoAdresi;
 
+            this._readData(sPath, this._oDataModel).then((oData) => {
+                that._clearHeader()
+                that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oKaynakDepo);
+                that._jsonModel.setProperty("/Header/HareketTuru", sHareketTuru);
+                that._jsonModel.setProperty("/Header/HareketTuruTanim", sHareketTuruTanim);
+            }).catch((oError) => {
+                MessageBox.error(JSON.parse(oError.responseText).error.message.value)
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide()
+            })
         },
 
         _deleteRowTable: function (aSelectedRows) {
+            let that = this,
+                oEntry = {
+                    Type: ""
+                },
+                aGuids = [];
 
+            aSelectedRows.forEach((item) => {
+                let oGuid = {
+                    Guid: item.Guid
+                };
+                aGuids.push(oGuid);
+            })
+
+            oEntry.NavToKalemSilItem = aGuids;
+
+            this._createData("/KalemSilHeaderSet", oEntry, this._oDataModel).then((oData) => {
+                debugger;
+            }).catch((oError) => {
+                MessageBox.error(JSON.parse(oError.responseText).error.message.value)
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide()
+            })
         },
 
         _saveTransfer: function (aRows) {
+            let that = this,
+                oEntry = {
+                    Type: ""
+                },
+                aGuids = [];
 
+            aRows.forEach((item) => {
+                let oGuid = {
+                    Guid: item.getBindingContext("jsonModel").getObject().Guid
+                };
+                aGuids.push(oGuid);
+            })
+
+            oEntry.NavToKaydetItem = aGuids;
+
+            this._createData("/KaydetHeaderSet", oEntry, this._oDataModel).then((oData) => {
+                debugger;
+            }).catch((oError) => {
+                MessageBox.error(JSON.parse(oError.responseText).error.message.value)
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide()
+            })
         },
 
         _prepareValueHelpDialog: function (oEvent, fragmentName) {
@@ -177,6 +292,11 @@ sap.ui.define([
             sDescription = oSelectedItem.getDescription();
             sType = oSelectedItem.getInfo();
 
+            if (sInputId.includes("idKaynakDepoAdresiInput")) {
+                this._jsonModel.setProperty("/Lgtyp", sType);
+                this._focusInput("idBarkodInput", 200)
+                this._getItems();
+            }
             this._valueHelpInput.setValue(sTitle);
             this._valueHelpInput.setDescription(sDescription);
 

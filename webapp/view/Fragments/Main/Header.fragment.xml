@@ -4,11 +4,11 @@
     <FlexBox justifyContent="Center">
         <form:SimpleForm layout="ResponsiveGridLayout">
             <Label text="{i18n>HAREKET_TURU}" design="Bold"></Label>
-            <Input id="idHareketTuruInput" value="{jsonModel>/Header/HareketTuru}" description="{jsonModel>/Header/HareketTuruTanim}" submit="onHareketTuruInputSubmit" liveChange="onHareketTuruInputLiveChange" showValueHelp="true" valueHelpRequest="_prepareValueHelpDialog($event, 'HareketTuru')" />
+            <Input id="idHareketTuruInput" value="{jsonModel>/Header/HareketTuru}" description="{jsonModel>/Header/HareketTuruTanim}" submit="onHareketTuruInputSubmit" liveChange="onHareketTuruInputLiveChange" showValueHelp="true" valueHelpRequest="_prepareValueHelpDialog($event, 'HareketTuru')" required="true" change="onHareketTuruInputSubmit"/>
             <Label text="{i18n>KAYNAK_DEPO_ADRESI}" design="Bold"></Label>
-            <Input id="idKaynakDepoAdresiInput" value="{jsonModel>/Header/KaynakDepoAdresi}" submit="onKaynakDepoAdresiInputSubmit" liveChange="onKaynakDepoAdresiInputLiveChange" showValueHelp="true" valueHelpRequest="_prepareValueHelpDialog($event, 'KaynakDepoAdresi')"/>
+            <Input id="idKaynakDepoAdresiInput" value="{jsonModel>/Header/KaynakDepoAdresi}" submit="onKaynakDepoAdresiInputSubmit" liveChange="onKaynakDepoAdresiInputLiveChange" showValueHelp="true" valueHelpRequest="_prepareValueHelpDialog($event, 'KaynakDepoAdresi')" required="true" change="onKaynakDepoAdresiInputSubmit"/>
             <Label text="{i18n>BARKOD}" design="Bold"></Label>
-            <Input id="idBarkodInput" value="{jsonModel>/Header/Barkod}" submit="onBarkodInputSubmit" liveChange="onBarkodInputLiveChange"/>
+            <Input id="idBarkodInput" value="{jsonModel>/Header/Barkod}" submit="onBarkodInputSubmit" liveChange="onBarkodInputLiveChange" required="true"/>
             <Label text="{i18n>MALZEME}" design="Bold"></Label>
             <Input value="{jsonModel>/Header/Matnr}" editable="false"/>
             <Label text="{i18n>MALZEME_TANIMI}" design="Bold"></Label>
@@ -16,9 +16,9 @@
             <Label text="{i18n>PARTI}" design="Bold"></Label>
             <Input value="{jsonModel>/Header/Charg}" editable="false"/>
             <Label text="{i18n>PYP_MASRAF_YERI}" design="Bold"></Label>
-            <Input id="idPypMasrafYeriInput" value="{jsonModel>/Header/Pyp_MasrafYeri}" editable="{jsonModel>/PypMasrafYeriEditable}" showValueHelp="true" submit="onPypMasrafYeriInputSubmit" valueHelpRequest="_prepareValueHelpDialog($event, 'PypMasrafYeri')"/>
+            <Input id="idPypMasrafYeriInput" value="{jsonModel>/Header/Pyp_MasrafYeri}" editable="{jsonModel>/PypMasrafYeriEditable}" showValueHelp="true" submit="onPypMasrafYeriInputSubmit" valueHelpRequest="_prepareValueHelpDialog($event, 'PypMasrafYeri')" required="true"/>
             <Label text="{i18n>MIKTAR_VE_BIRIM}" design="Bold"></Label>
-            <Input id="idMiktarInput" value="{jsonModel>/Header/Menge}" description="{jsonModel>/Header/Meins}" submit="onMengeInputSubmit"/>
+            <Input id="idMiktarInput" value="{jsonModel>/Header/Menge}" description="{jsonModel>/Header/Meins}" submit="onMengeInputSubmit" required="true"/>
             <Label text="{i18n>STOK_BILGI}" design="Bold"></Label>
             <Input value="{jsonModel>/Header/StokBilgi}" editable="false"/>
             <HBox >
