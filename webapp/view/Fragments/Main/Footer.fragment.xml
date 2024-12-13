@@ -1,0 +1,7 @@
+<c:FragmentDefinition xmlns="sap.m"
+	xmlns:c="sap.ui.core">
+	<OverflowToolbar >
+		<ToolbarSpacer ></ToolbarSpacer>
+		<Button text="{i18n>KAYDET}" press="onKaydetButtonPress" icon="sap-icon://save" type="Accept"/>
+	</OverflowToolbar>
+</c:FragmentDefinition>

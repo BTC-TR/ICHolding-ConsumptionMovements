@@ -1,0 +1,38 @@
+<c:FragmentDefinition xmlns="sap.m"
+	xmlns:c="sap.ui.core">
+	<Table id="idTransferTable" items="{jsonModel>/TransferTablosu}" alternateRowColors="true" growing="true" growingScrollToLoad="true" includeItemInSelection="true" mode="MultiSelect" sticky="ColumnHeaders,HeaderToolbar">
+		<headerToolbar>
+			<OverflowToolbar >
+				<Title text="({= ${jsonModel>/TransferTablosu}.length})"></Title>
+				<ToolbarSpacer ></ToolbarSpacer>
+				<Button text="{i18n>SIL}" press="onSilButtonPress" icon="sap-icon://delete" type="Reject"/>
+			</OverflowToolbar>
+		</headerToolbar>
+		<columns>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Label text="{i18n>KAYNAK_DEPO_ADRESI}" design="Bold" wrapping="true"></Label>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Label text="{i18n>MALZEME_VE_TANIMI}" design="Bold" wrapping="true"></Label>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Label text="{i18n>PARTI}" design="Bold" wrapping="true"></Label>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Label text="{i18n>PYP_MASRAF_YERI}" design="Bold" wrapping="true"></Label>
+			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Label text="{i18n>MIKTAR_VE_BIRIM}" design="Bold" wrapping="true"></Label>
+			</Column>
+		</columns>
+		<ColumnListItem >
+			<cells>
+				<ObjectIdentifier ></ObjectIdentifier>
+				<ObjectStatus ></ObjectStatus>
+				<ObjectNumber ></ObjectNumber>
+				<ObjectIdentifier ></ObjectIdentifier>
+				<ObjectStatus ></ObjectStatus>
+			</cells>
+		</ColumnListItem>
+	</Table>
+</c:FragmentDefinition>

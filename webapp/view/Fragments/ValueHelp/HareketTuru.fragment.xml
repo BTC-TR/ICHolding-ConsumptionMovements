@@ -1,0 +1,6 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <SelectDialog items="{jsonModel>/HareketTuruSH}" title="{i18n>HAREKET_TURU_SH}" confirm="onSelectDialogConfirm" search="onSelectDialogSearch" cancel="onSelectDialogCancel" liveChange="onSelectDialogSearch">
+        <StandardListItem title="" info=""></StandardListItem>
+    </SelectDialog>
+</c:FragmentDefinition>

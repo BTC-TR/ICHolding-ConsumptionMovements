@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "3.1"
+metadata:
+  name: com.btc.zwmtuketimhareketleri
+type: application
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        target:
+          url: http://thrain.icholding.local:8000
+          client: "100"
+        app:
+          name: ZWM_TKTM_HRKTLR
+          description: Tüketim Hareketleri
+          package: ZFIORI
+          transport: IFDK900305
+        exclude:
+          - /test/
