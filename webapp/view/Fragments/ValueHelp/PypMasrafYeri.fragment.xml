@@ -1,6 +1,6 @@
 <c:FragmentDefinition xmlns="sap.m"
     xmlns:c="sap.ui.core">
-    <SelectDialog items="{jsonModel>/PypMasrafYeriSH}" title="{i18n>PYP_MASRAF_YERI_SH}" confirm="onSelectDialogConfirm" search="onSelectDialogSearch" cancel="onSelectDialogCancel" liveChange="onSelectDialogSearch">
-        <StandardListItem title="" info=""></StandardListItem>
+    <SelectDialog items="{jsonModel>/MasrafYeriSH}" title="{i18n>PYP_MASRAF_YERI_SH}" confirm="onSelectDialogConfirm" search="onSelectDialogSearch" cancel="onSelectDialogCancel" liveChange="onSelectDialogSearch">
+        <StandardListItem title="{jsonModel>Kostl}" description="{jsonModel>Ktext}"></StandardListItem>
     </SelectDialog>
 </c:FragmentDefinition>

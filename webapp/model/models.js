@@ -17,7 +17,11 @@ sap.ui.define([
 
             createJSONModel: function () {
                 return new JSONModel({
-                    PypMasrafYeriEditable: false,
+                    SiparisNoVisibility: false,
+                    PypVisibility: false,
+                    SiparisNo: "",
+                    SiparisTanim: "",
+                    PypEditable: false,
                     Header: {
                         HareketTuru: "",
                         HareketTuruTanim: "",
@@ -27,6 +31,8 @@ sap.ui.define([
                         Maktx: "",
                         Charg: "",
                         Pyp_MasrafYeri: "",
+                        Pyp: "",
+                        MasrafYeriTanim: "",
                         Menge: "",
                         Meins: "",
                         StokBilgi: "",

@@ -1,0 +1,6 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <SelectDialog items="{jsonModel>/SiparisNoSH}" title="{i18n>SIPARIS_NO_SH}" confirm="onSelectDialogConfirm" search="onSelectDialogSearch" cancel="onSelectDialogCancel" liveChange="onSelectDialogSearch">
+        <StandardListItem title="{jsonModel>Aufnr}" description="{jsonModel>Ktext}"></StandardListItem>
+    </SelectDialog>
+</c:FragmentDefinition>

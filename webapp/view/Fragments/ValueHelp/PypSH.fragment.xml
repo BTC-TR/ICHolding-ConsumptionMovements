@@ -1,0 +1,6 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <SelectDialog items="{path:'jsonModel>/PypSH', length: 9999}" title="{i18n>PYP_SH}" confirm="onSelectDialogConfirm" search="onSelectDialogSearch" cancel="onSelectDialogCancel" liveChange="onSelectDialogSearch" growingThreshold="1000">
+        <StandardListItem title="{jsonModel>Posid}" description="{jsonModel>Post1}"></StandardListItem>
+    </SelectDialog>
+</c:FragmentDefinition>

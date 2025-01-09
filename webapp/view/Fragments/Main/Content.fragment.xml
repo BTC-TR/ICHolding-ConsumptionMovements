@@ -24,6 +24,9 @@
 			<Column minScreenWidth="Tablet" demandPopin="true">
 				<Label text="{i18n>MIKTAR_VE_BIRIM}" design="Bold" wrapping="true"></Label>
 			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+				<Label text="{i18n>SIPARIS_NO}" design="Bold" wrapping="true"></Label>
+			</Column>
 		</columns>
 		<ColumnListItem >
 			<cells>
@@ -32,6 +35,7 @@
 				<ObjectStatus text="{jsonModel>Charg}" state="Success"></ObjectStatus>
 				<ObjectStatus text="{jsonModel>PsPspnr} / {jsonModel>Kostl}" state="Warning"></ObjectStatus>
 				<ObjectNumber number="{path:'jsonModel>Menge', formatter:'.formatter.numberUnit'}" unit="{jsonModel>Meins}" state="Error"></ObjectNumber>
+				<ObjectStatus text="{jsonModel>Aufnr}" state="Information"></ObjectStatus>
 			</cells>
 		</ColumnListItem>
 	</Table>

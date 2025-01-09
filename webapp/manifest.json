@@ -29,6 +29,7 @@
     },
     "sap.ui": {
         "technology": "UI5",
+        "fullWidth": true,
         "icons": {
             "icon": "",
             "favIcon": "",
@@ -111,7 +112,7 @@
             "targets": {
                 "TargetMain": {
                     "viewType": "XML",
-                    "transition": "slide",
+                    "transition": "flip",
                     "clearControlAggregation": false,
                     "viewId": "Main",
                     "viewName": "Main"

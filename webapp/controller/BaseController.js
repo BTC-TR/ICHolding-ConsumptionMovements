@@ -114,13 +114,47 @@ sap.ui.define([
         },
 
         _getHareketTuru: function () {
-
+            let that = this;
+            this._readMultiData("/HareketTuruSHSet", [], this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/HareketTuruSH", oData.results);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
         },
 
         _getKaynakDepoAdresi: function () {
             let that = this;
             this._readMultiData("/KaynakDepoSHSet", [], this._oDataModel).then((oData) => {
                 that._jsonModel.setProperty("/KaynakDepoAdresiSH", oData.results);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+
+        _getMasrafYeri: function () {
+            let that = this;
+            this._readMultiData("/MasrafYeriSHSet", [
+                new Filter("Bukrs", FilterOperator.EQ, "2401")
+            ], this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/MasrafYeriSH", oData.results);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+
+        _getSiparisNo: function () {
+            let that = this;
+            this._readMultiData("/SiparisNoSHSet", [], this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/SiparisNoSH", oData.results);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+
+        _getPyp: function () {
+            let that = this;
+            this._readMultiData("/PypSHSet", [], this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/PypSH", oData.results);
             }).finally(() => {
                 sap.ui.core.BusyIndicator.hide();
             })
@@ -159,6 +193,11 @@ sap.ui.define([
                 that._jsonModel.setProperty("/Xchpf", oData.EvXchpf)
                 that._jsonModel.setProperty("/Header/StokBilgi", oData.EvVerme)
                 that._jsonModel.setProperty("/Header/Meins", oData.EvMeins)
+                that._jsonModel.setProperty("/Lgort", oData.EvLgort)
+
+                if (oData.EvPyp !== "") {
+                    that._jsonModel.setProperty("/PypVisibility", true)
+                }
 
             }).catch((oError) => {
                 this._jsonModel.setProperty("/Header/Barkod", "")
@@ -171,23 +210,29 @@ sap.ui.define([
 
         _addBarcode: function (oHeaderData) {
             let that = this,
+                sSiparisTanim = this._jsonModel.getData().SiparisNoSH.find((item) => {
+                    return item.Aufnr === that._jsonModel.getData().SiparisNo;
+                }),
                 sPath = this._oDataModel.createKey("/BarkodEkleSet", {
-                    Werks: "",
-                    Lgort: "",
+                    Werks: "2401",
+                    Lgort: this._jsonModel.getData().Lgort,
                     Lgpla: oHeaderData.KaynakDepoAdresi,
                     Lgtyp: this._jsonModel.getData().Lgtyp,
                     Matnr: oHeaderData.Matnr,
                     Maktx: oHeaderData.Maktx,
                     Charg: oHeaderData.Charg,
-                    PsPspnr: oHeaderData.Pyp_MasrafYeri,
+                    PsPspnr: oHeaderData.Pyp,
                     Kostl: oHeaderData.Pyp_MasrafYeri,
                     Verme: oHeaderData.StokBilgi,
                     Menge: oHeaderData.Menge,
                     Meins: oHeaderData.Meins,
-                    Bwart: "",
+                    Bwart: oHeaderData.HareketTuru.slice(-1) === "Q" ? oHeaderData.HareketTuru.slice(0, -1) : oHeaderData.HareketTuru,
+                    Aufnr: this._jsonModel.getData().SiparisNo,
+                    Sobkz: oHeaderData.HareketTuru.slice(-1) === "Q" ? "Q" : "",
+                    Ktext: sSiparisTanim ? sSiparisTanim.Ktext : ""
                 }),
-                sHareketTuru = this._jsonModel.getData().Header.HareketTuru,
-                sHareketTuruTanim = this._jsonModel.getData().Header.HareketTuruTanim,
+                sHareketTuru = oHeaderData.HareketTuru,
+                sHareketTuruTanim = oHeaderData.HareketTuruTanim,
                 oKaynakDepo = oHeaderData.KaynakDepoAdresi;
 
             this._readData(sPath, this._oDataModel).then((oData) => {
@@ -195,23 +240,29 @@ sap.ui.define([
                 that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oKaynakDepo);
                 that._jsonModel.setProperty("/Header/HareketTuru", sHareketTuru);
                 that._jsonModel.setProperty("/Header/HareketTuruTanim", sHareketTuruTanim);
+
+                that._jsonModel.setProperty("/SiparisNo", "")
+                that._jsonModel.setProperty("/SiparisTanim", "")
+                that._jsonModel.setProperty("/PypVisibility", false)
             }).catch((oError) => {
                 MessageBox.error(JSON.parse(oError.responseText).error.message.value)
             }).finally(() => {
                 sap.ui.core.BusyIndicator.hide()
+                this._getItems()
             })
         },
 
         _deleteRowTable: function (aSelectedRows) {
             let that = this,
                 oEntry = {
-                    Type: ""
+                    Type: "",
+                    NavToKalemSilMessage: []
                 },
                 aGuids = [];
 
             aSelectedRows.forEach((item) => {
                 let oGuid = {
-                    Guid: item.Guid
+                    Guid: item.getObject().Guid
                 };
                 aGuids.push(oGuid);
             })
@@ -219,18 +270,21 @@ sap.ui.define([
             oEntry.NavToKalemSilItem = aGuids;
 
             this._createData("/KalemSilHeaderSet", oEntry, this._oDataModel).then((oData) => {
-                debugger;
+                MessageToast.show(oData.NavToKalemSilMessage.results[0].Message)
             }).catch((oError) => {
-                MessageBox.error(JSON.parse(oError.responseText).error.message.value)
+                MessageToast.show(JSON.parse(oError.responseText).error.message.value)
             }).finally(() => {
                 sap.ui.core.BusyIndicator.hide()
+                this._getItems()
+                this._oTable.removeSelections()
             })
         },
 
         _saveTransfer: function (aRows) {
             let that = this,
                 oEntry = {
-                    Type: ""
+                    Type: "",
+                    NavToKaydetMessage: []
                 },
                 aGuids = [];
 
@@ -244,7 +298,13 @@ sap.ui.define([
             oEntry.NavToKaydetItem = aGuids;
 
             this._createData("/KaydetHeaderSet", oEntry, this._oDataModel).then((oData) => {
-                debugger;
+                oData.NavToKaydetMessage.results[0].Type === "S" ? MessageBox.success(oData.NavToKaydetMessage.results[0].Message, {
+                    actions: MessageBox.Action.CLOSE,
+                    onClose: function () {
+                        that._getItems();
+                        that._clearHeader()
+                    }
+                }) : MessageBox.error(oData.NavToKaydetMessage.results[0].Message)
             }).catch((oError) => {
                 MessageBox.error(JSON.parse(oError.responseText).error.message.value)
             }).finally(() => {
@@ -272,7 +332,14 @@ sap.ui.define([
         onSelectDialogSearch: function (oEvent) {
             var sValue = oEvent.getParameter("value");
             var oFilter = new Filter([
-                new Filter("Lgpla", FilterOperator.Contains, sValue)
+                new Filter("Lgpla", FilterOperator.Contains, sValue),
+                new Filter("Kostl", FilterOperator.Contains, sValue),
+                new Filter("Ktext", FilterOperator.Contains, sValue),
+                new Filter("Bwart", FilterOperator.Contains, sValue),
+                new Filter("Btext", FilterOperator.Contains, sValue),
+                new Filter("Aufnr", FilterOperator.Contains, sValue),
+                new Filter("Posid", FilterOperator.Contains, sValue),
+                new Filter("Post1", FilterOperator.Contains, sValue),
             ], false);
             var oBinding = oEvent.getSource().getBinding("items");
             oBinding.filter([oFilter]);
@@ -295,11 +362,35 @@ sap.ui.define([
             if (sInputId.includes("idKaynakDepoAdresiInput")) {
                 this._jsonModel.setProperty("/Lgtyp", sType);
                 this._focusInput("idBarkodInput", 200)
-                this._getItems();
+
+                setTimeout(() => {
+                    this._getItems();
+                }, 300);
             }
+
+            if (sInputId.includes("idHareketTuruInput")) {
+
+                if (sTitle === "A09" || sTitle === "A30" || sTitle === "221" || sTitle === "221Q") {
+                    if (sTitle === "A09" || sTitle === "A30") {
+                        this._jsonModel.setProperty("/SiparisNoVisibility", true)
+                    } else {
+                        this._jsonModel.setProperty("/SiparisNoVisibility", false)
+                    }
+                } else {
+                    if (sTitle !== "A09" || sTitle !== "A30") {
+                        this._jsonModel.setProperty("/SiparisNoVisibility", false)
+                    }
+                }
+
+                sTitle === "221" || sTitle === "A09" ? [this._jsonModel.setProperty("/PypEditable", true), this._jsonModel.setProperty("/PypVisibility", true)] : [this._jsonModel.setProperty("/PypEditable", false), this._jsonModel.setProperty("/PypVisibility", false)]
+
+                this._focusInput("idKaynakDepoAdresiInput", 200)
+            }
+
+            sInputId.includes("idPypMasrafYeriInput") && this._jsonModel.getData().SiparisNoVisibility ? this._focusInput("idSiparisNoInput", 200) : sInputId.includes("idPypMasrafYeriInput") && !this._jsonModel.getData().SiparisNoVisibility ? this._focusInput("idMiktarInput", 200) : ""
+            sInputId.includes("idSiparisNoInput") ? this._focusInput("idMiktarInput", 200) : ""
             this._valueHelpInput.setValue(sTitle);
             this._valueHelpInput.setDescription(sDescription);
-
         },
 
         onSelectDialogCancel: function (oEvent) {
