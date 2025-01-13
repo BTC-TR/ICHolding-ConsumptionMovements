@@ -192,7 +192,22 @@ sap.ui.define([
                     return MessageBox.error(this.getResourceBundle().getText("ISLENECEK_VERI_YOK"))
                 }
 
+                this._kaydetDialog = sap.ui.xmlfragment(this.getView().getId(), "com.btc.zwmtuketimhareketleri.view.Fragments.Dialog.BelgeKayit", this);
+                this.getView().addDependent(this._kaydetDialog);
+
+                this._kaydetDialog.open();
+
+            },
+
+            onIptalButtonPress: function (oEvent) {
+                oEvent.oSource.getParent().close();
+            },
+
+            onKaydetBelgeButtonPress: function () {
+                if (!this._jsonModel.getData().BelgeTarihi || !this._jsonModel.getData().BelgeMetni) {
+                    return sap.m.MessageBox.error(this.getResourceBundle().getText("ZORUNLU_ALANLARI_DOLDURUN"))
+                }
                 this._saveTransfer(this._oTable.getItems());
-            }
+            },
         });
     });

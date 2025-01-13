@@ -1,0 +1,18 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:c="sap.ui.core">
+    <Dialog title="{i18n>BELGE_KAYDET}">
+        <content>
+            <form:SimpleForm layout="ResponsiveGridLayout">
+                <Label text="{i18n>BELGE_TARIHI}" design="Bold"></Label>
+                <DatePicker displayFormat="dd/MM/yyyy" required="true" dateValue="{jsonModel>/BelgeTarihi}"/>
+                <Label text="{i18n>BASLIK_METNI}" design="Bold"></Label>
+                <TextArea value="{jsonModel>/BelgeMetni}" maxLength="25" required="true"></TextArea>
+            </form:SimpleForm >
+        </content>
+        <buttons>
+            <Button text="{i18n>IPTAL}" type="Reject" press="onIptalButtonPress"></Button>
+            <Button text="{i18n>KAYDET}" type="Accept" press="onKaydetBelgeButtonPress"></Button>
+        </buttons>
+    </Dialog>
+</c:FragmentDefinition>

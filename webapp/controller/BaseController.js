@@ -284,10 +284,13 @@ sap.ui.define([
             let that = this,
                 oEntry = {
                     Type: "",
+                    IvBelgeTarihi: this._jsonModel.getData().BelgeTarihi,
+                    IvBelgeMetni: this._jsonModel.getData().BelgeMetni,
                     NavToKaydetMessage: []
                 },
                 aGuids = [];
 
+            oEntry.IvBelgeTarihi.setHours(12)
             aRows.forEach((item) => {
                 let oGuid = {
                     Guid: item.getBindingContext("jsonModel").getObject().Guid
@@ -303,6 +306,7 @@ sap.ui.define([
                     onClose: function () {
                         that._getItems();
                         that._clearHeader()
+                        that._kaydetDialog.close()
                     }
                 }) : MessageBox.error(oData.NavToKaydetMessage.results[0].Message)
             }).catch((oError) => {
