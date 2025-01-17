@@ -59,7 +59,7 @@ sap.ui.define([
                         this._jsonModel.setProperty("/SiparisNoVisibility", false)
                     }
 
-                    oHareketTuru.Bwart === "221" || oHareketTuru.Bwart === "A09" ? [this._jsonModel.setProperty("/PypEditable", true), this._jsonModel.setProperty("/PypVisibility", true)] : [this._jsonModel.setProperty("/PypEditable", false), this._jsonModel.setProperty("/PypVisibility", false)]
+                    oHareketTuru.Bwart === "221" || oHareketTuru.Bwart === "A09" || oHareketTuru.Bwart === "A30" ? [this._jsonModel.setProperty("/PypEditable", true), this._jsonModel.setProperty("/PypVisibility", true)] : [this._jsonModel.setProperty("/PypEditable", false), this._jsonModel.setProperty("/PypVisibility", false)]
 
                 } else {
                     oEvent.getSource().setValue("");

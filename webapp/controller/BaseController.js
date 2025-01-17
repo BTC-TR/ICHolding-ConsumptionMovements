@@ -387,7 +387,7 @@ sap.ui.define([
                     }
                 }
 
-                sTitle === "221" || sTitle === "A09" ? [this._jsonModel.setProperty("/PypEditable", true), this._jsonModel.setProperty("/PypVisibility", true)] : [this._jsonModel.setProperty("/PypEditable", false), this._jsonModel.setProperty("/PypVisibility", false)]
+                sTitle === "221" || sTitle === "A09" || sTitle === "A30" ? [this._jsonModel.setProperty("/PypEditable", true), this._jsonModel.setProperty("/PypVisibility", true)] : [this._jsonModel.setProperty("/PypEditable", false), this._jsonModel.setProperty("/PypVisibility", false)]
 
                 this._focusInput("idKaynakDepoAdresiInput", 200)
             }
