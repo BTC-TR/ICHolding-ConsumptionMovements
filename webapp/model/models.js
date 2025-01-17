@@ -22,6 +22,7 @@ sap.ui.define([
                     SiparisNo: "",
                     SiparisTanim: "",
                     PypEditable: false,
+                    FisRequired: false,
                     Header: {
                         HareketTuru: "",
                         HareketTuruTanim: "",

@@ -286,6 +286,7 @@ sap.ui.define([
                     Type: "",
                     IvBelgeTarihi: this._jsonModel.getData().BelgeTarihi,
                     IvBelgeMetni: this._jsonModel.getData().BelgeMetni,
+                    IvFis: this._jsonModel.getData().MalzemeFisi,
                     NavToKaydetMessage: []
                 },
                 aGuids = [];

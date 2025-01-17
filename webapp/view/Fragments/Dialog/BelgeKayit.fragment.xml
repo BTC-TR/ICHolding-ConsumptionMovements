@@ -1,4 +1,4 @@
-<c:FragmentDefinition xmlns="sap.m"
+<c:FragmentDefinition xmlns:table="sap.ui.table" xmlns="sap.m"
     xmlns:form="sap.ui.layout.form"
     xmlns:c="sap.ui.core">
     <Dialog title="{i18n>BELGE_KAYDET}">
@@ -8,6 +8,9 @@
                 <DatePicker displayFormat="dd/MM/yyyy" required="true" dateValue="{jsonModel>/BelgeTarihi}"/>
                 <Label text="{i18n>BASLIK_METNI}" design="Bold"></Label>
                 <TextArea value="{jsonModel>/BelgeMetni}" maxLength="25" required="true"></TextArea>
+
+                <Label text="{i18n>MALZEME_FISI}" design="Bold"/>
+                <TextArea value="{jsonModel>/MalzemeFisi}" maxLength="16"></TextArea>
             </form:SimpleForm >
         </content>
         <buttons>
