@@ -169,21 +169,22 @@ sap.ui.define([
             this._readMultiData("/KalemGetirSet", aFilters, this._oDataModel).then((oData) => {
                 that._jsonModel.setProperty("/TransferTablosu", oData.results)
             }).catch((oError) => {
-                MessageToast.show(JSON.parse(oError.responseText).error.message.value)
+                // MessageToast.show(JSON.parse(oError.responseText).error.message.value)
                 that._jsonModel.setProperty("/TransferTablosu", [])
             }).finally(() => {
                 sap.ui.core.BusyIndicator.hide()
             })
         },
 
-        _checkBrcode: function (sBarcode, oKaynakDepo, oLgtyp) {
+        _checkBrcode: function (sBarcode, oKaynakDepo, oLgtyp, sHareketTuru) {
             let that = this,
                 sPath = this._oDataModel.createKey("/BarkodOkutSet", {
                     IvBarkod: sBarcode,
                     IvKlgpla: oKaynakDepo,
-                    IvLgtyp: oLgtyp
+                    IvLgtyp: oLgtyp,
+                    IvHareketTuru: sHareketTuru
                 });
-
+                
             this._readData(sPath, this._oDataModel).then((oData) => {
                 that._jsonModel.setProperty("/Header/Barkod", oData.IvBarkod)
                 that._jsonModel.setProperty("/Header/Matnr", oData.EvMatnr)
@@ -308,6 +309,9 @@ sap.ui.define([
                         that._getItems();
                         that._clearHeader()
                         that._kaydetDialog.close()
+                        that._jsonModel.setProperty("/BelgeTarihi", {})
+                        that._jsonModel.setProperty("/MalzemeFisi", "")
+                        that._jsonModel.setProperty("/BelgeMetni", "")
                     }
                 }) : MessageBox.error(oData.NavToKaydetMessage.results[0].Message)
             }).catch((oError) => {
@@ -375,8 +379,8 @@ sap.ui.define([
 
             if (sInputId.includes("idHareketTuruInput")) {
 
-                if (sTitle === "A09" || sTitle === "A30" || sTitle === "221" || sTitle === "221Q") {
-                    if (sTitle === "A09" || sTitle === "A30") {
+                if (sTitle === "A09" || sTitle === "A30" || sTitle === "221" || sTitle === "221Q" || sTitle === "A09Q" || sTitle === "A30Q") {
+                    if (sTitle === "A09" || sTitle === "A30" || sTitle === "A09Q" || sTitle === "A30Q") {
                         this._jsonModel.setProperty("/SiparisNoVisibility", true)
                     } else {
                         this._jsonModel.setProperty("/SiparisNoVisibility", false)

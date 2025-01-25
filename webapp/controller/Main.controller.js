@@ -46,20 +46,21 @@ sap.ui.define([
                     oEvent.oSource.setDescription(oHareketTuru.Btext);
                     this._focusInput("idKaynakDepoAdresiInput", 200)
 
-                    if (oHareketTuru.Bwart === "A09" || oHareketTuru.Bwart === "A30" || oHareketTuru.Bwart === "221" || oHareketTuru.Bwart === "221Q") {
-                        if (oHareketTuru.Bwart === "A09" || oHareketTuru.Bwart === "A30") {
+                    // if (oHareketTuru.Bwart === "A09" || oHareketTuru.Bwart === "A30" || oHareketTuru.Bwart === "221" || oHareketTuru.Bwart === "221Q") {
+                        if (oHareketTuru.Bwart === "A09" || oHareketTuru.Bwart === "A30" || oHareketTuru.Bwart === "A09Q" || oHareketTuru.Bwart === "A30Q") {
                             this._jsonModel.setProperty("/SiparisNoVisibility", true)
                         } else {
                             this._jsonModel.setProperty("/SiparisNoVisibility", false)
                         }
-                    } else {
+                    // } else {
                         if (oHareketTuru.Bwart !== "A09" || oHareketTuru.Bwart !== "A30") {
                             this._jsonModel.setProperty("/SiparisNoVisibility", false)
                         }
                         this._jsonModel.setProperty("/SiparisNoVisibility", false)
-                    }
+                    // }
 
                     oHareketTuru.Bwart === "221" || oHareketTuru.Bwart === "A09" || oHareketTuru.Bwart === "A30" ? [this._jsonModel.setProperty("/PypEditable", true), this._jsonModel.setProperty("/PypVisibility", true)] : [this._jsonModel.setProperty("/PypEditable", false), this._jsonModel.setProperty("/PypVisibility", false)]
+                   
 
                 } else {
                     oEvent.getSource().setValue("");
@@ -90,12 +91,12 @@ sap.ui.define([
             },
 
             onBarkodInputSubmit: function (oEvent) {
-                this._checkBrcode(oEvent.getParameter("value"), this._jsonModel.getData().Header.KaynakDepoAdresi, this._jsonModel.getData().Lgtyp);
+                this._checkBrcode(oEvent.getParameter("value"), this._jsonModel.getData().Header.KaynakDepoAdresi, this._jsonModel.getData().Lgtyp, this._jsonModel.getData().Header.HareketTuru);
                 this._focusInput("idPypMasrafYeriInput", 300);
             },
 
             onBarkodInputLiveChange: function (oEvent) {
-                this._checkBrcode(oEvent.getParameter("value"), this._jsonModel.getData().Header.KaynakDepoAdresi, this._jsonModel.getData().Lgtyp);
+                this._checkBrcode(oEvent.getParameter("value"), this._jsonModel.getData().Header.KaynakDepoAdresi, this._jsonModel.getData().Lgtyp, this._jsonModel.getData().Header.HareketTuru);
                 this._focusInput("idPypMasrafYeriInput", 300);
             },
 
