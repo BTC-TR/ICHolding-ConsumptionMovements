@@ -20,6 +20,6 @@ builder:
           name: ZWM_TKTM_HRKTLR
           description: Tüketim Hareketleri
           package: ZFIORI
-          transport: IFDK900305
+          transport: IFDK900326
         exclude:
           - /test/

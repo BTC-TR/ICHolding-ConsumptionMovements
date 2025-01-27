@@ -309,7 +309,7 @@ sap.ui.define([
                         that._getItems();
                         that._clearHeader()
                         that._kaydetDialog.close()
-                        that._jsonModel.setProperty("/BelgeTarihi", {})
+                        that._jsonModel.setProperty("/BelgeTarihi", undefined)
                         that._jsonModel.setProperty("/MalzemeFisi", "")
                         that._jsonModel.setProperty("/BelgeMetni", "")
                     }
