@@ -1,6 +1,6 @@
 <c:FragmentDefinition xmlns="sap.m"
     xmlns:c="sap.ui.core">
     <SelectDialog items="{jsonModel>/KaynakDepoAdresiSH}" title="{i18n>KAYNAK_DEPO_ADRESI_SH}" confirm="onSelectDialogConfirm" search="onSelectDialogSearch" cancel="onSelectDialogCancel" liveChange="onSelectDialogSearch">
-        <StandardListItem title="{jsonModel>Lgpla}" info="{jsonModel>Lgtyp}"></StandardListItem>
+        <StandardListItem title="{jsonModel>Lgpla}" info="{jsonModel>Lgtyp}" description="{parts:[{path:'jsonModel>Verme'}, {path:'jsonModel>Meins'}], type:'sap.ui.model.type.Currency', formatOptions:{showMeasure: false}}"></StandardListItem>
     </SelectDialog>
 </c:FragmentDefinition>

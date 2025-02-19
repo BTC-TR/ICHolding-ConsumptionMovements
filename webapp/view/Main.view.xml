@@ -3,6 +3,16 @@
     xmlns:core="sap.ui.core"
     xmlns="sap.m">
     <uxap:ObjectPageLayout showFooter="true">
+        <uxap:headerTitle>
+            <uxap:ObjectPageDynamicHeaderTitle >
+                <uxap:content>
+                    <VBox
+    >
+                        <Switch change="onSlaytSwitchChange" customTextOff="A" customTextOn="B"></Switch>
+                    </VBox>
+                </uxap:content>
+            </uxap:ObjectPageDynamicHeaderTitle>
+        </uxap:headerTitle>
         <uxap:sections>
             <uxap:ObjectPageSection >
                 <uxap:subSections>

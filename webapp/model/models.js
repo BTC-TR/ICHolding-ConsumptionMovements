@@ -23,6 +23,7 @@ sap.ui.define([
                     SiparisTanim: "",
                     PypEditable: false,
                     FisRequired: false,
+                    BarkodEditable: false,
                     Header: {
                         HareketTuru: "",
                         HareketTuruTanim: "",
@@ -38,7 +39,11 @@ sap.ui.define([
                         Meins: "",
                         StokBilgi: "",
                     },
-                    TransferTablosu: []
+                    TransferTablosu: [],
+                    Visibility: {
+                        SlaytA: true,
+                        SlaytB: false
+                    }
                 })
             }
         };

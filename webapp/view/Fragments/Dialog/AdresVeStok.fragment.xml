@@ -1,0 +1,53 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <Dialog stretch="true" title="{i18n>ADRES_STOK_VE_MALZEME}" contentWidth="100%" contentHeight="100%" titleAlignment="Start">
+        <customHeader>
+
+            <Bar design="SubHeader">
+                <contentLeft>
+                    <Label text="{i18n>ADRES_STOK_VE_MALZEME}" design="Bold"></Label>
+                </contentLeft>
+                <contentRight>
+                    <Button icon="sap-icon://decline" press="_closeDialog($event)" type="Reject"></Button>
+                </contentRight>
+            </Bar>
+        </customHeader>
+        <content>
+            <Table items="{jsonModel>/AdresStokVeMalzeme}" alternateRowColors="true" includeItemInSelection="true" mode="MultiSelect" sticky="ColumnHeaders,HeaderToolbar" selectionChange="onAdresStokVeMalzemeTableSelectionChange">
+                <columns>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Label text="{i18n>MALZEME_VE_TANIM}" design="Bold" wrapping="true"></Label>
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Label text="{i18n>PARTI}" design="Bold" wrapping="true"></Label>
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Label text="{i18n>PYP_TANIMI}" design="Bold" wrapping="true"></Label>
+                    </Column>
+                    <Column minScreenWidth="Tablet" demandPopin="true">
+                        <Label text="{i18n>DEPO_ADRESI}" design="Bold" wrapping="true"></Label>
+                    </Column>
+                    <Column minScreenWidth="Desktop" demandPopin="true">
+                        <Label text="{i18n>ADRES_STOGU}" design="Bold" wrapping="true"></Label>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem >
+                        <cells>
+                            <ObjectIdentifier title="{jsonModel>Matnr}" text="{jsonModel>Maktx}" titleActive="true"></ObjectIdentifier>
+                            <ObjectStatus text="{jsonModel>Charg}" state="Success"></ObjectStatus>
+                            <ObjectStatus text="{jsonModel>Pyp}" state="Warning"></ObjectStatus>
+                            <ObjectStatus text="{jsonModel>Lgpla}" state="Information"></ObjectStatus>
+                            <Input value="{parts:[{path:'jsonModel>Verme'}, {path:'jsonModel>Meins'}], type:'sap.ui.model.type.Currency', formatOptions:{showMeasure: false}}" description="{jsonModel>Meins}" submit="onVermeInputChange" width="100%"></Input>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
+        </content>
+        <buttons>
+            <Button text="{i18n>TEMIZLE}" press="onClearButtonPress"></Button>
+            <Button text="{i18n>TAMAMLA}" press="onTamamlaButtonPress"></Button>
+        </buttons>
+    </Dialog>
+
+</c:FragmentDefinition>

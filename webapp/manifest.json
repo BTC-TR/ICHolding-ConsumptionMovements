@@ -74,12 +74,9 @@
                 "preload": true,
                 "dataSource": "ZWM_OD_TUKETIM_HAREKETLERI_SRV",
                 "settings": {
-                    "defaultBindingMode": "TwoWay",
                     "defaultCountMode": "Inline",
-                    "refreshAfterChange": false,
-                    "metadataUrlParams": {
-                        "sap-value-list": "none"
-                    }
+                    "defaultOperationMode": "Auto",
+                    "defaultBindingMode": "TwoWay"
                 }
             }
         },

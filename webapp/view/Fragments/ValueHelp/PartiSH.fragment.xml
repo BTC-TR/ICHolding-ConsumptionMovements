@@ -1,0 +1,6 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <SelectDialog items="{jsonModel>/PartiSH}" title="{i18n>PARTI_SH}" cancel="onSelectDialogCancel" confirm="onSelectDialogConfirm" search="onSelectDialogSearch" liveChange="onSelectDialogSearch" multiSelect="true">
+        <StandardListItem title="{jsonModel>Charg}"></StandardListItem>
+    </SelectDialog>
+</c:FragmentDefinition>

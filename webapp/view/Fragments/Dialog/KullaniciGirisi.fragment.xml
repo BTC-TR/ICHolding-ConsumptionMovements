@@ -1,0 +1,20 @@
+<c:FragmentDefinition xmlns:form="sap.ui.layout.form"
+    xmlns="sap.m"
+    xmlns:c="sap.ui.core">
+    <Dialog stretch="true" title="{i18n>ADRES_STOK_VE_MALZEME}" contentWidth="100%" contentHeight="100%">
+        <content>
+            <form:SimpleForm layout="ResponsiveGridLayout">
+                <Label text="{i18n>MASRAF_YERI}" design="Bold"></Label>
+                <Input value="{jsonModel>/Header/Pyp_MasrafYeri}" description="{jsonModel>/Header/MasrafYeriTanim}" showValueHelp="true" submit="onPypMasrafYeriInputSubmit" valueHelpRequest="_prepareValueHelpDialog($event, 'PypMasrafYeri')" required="true"/>
+                <Label text="{i18n>SIPARIS_NO}" design="Bold" visible="{jsonModel>/SiparisNoVisibility}"/>
+                <Input value="{jsonModel>/SiparisNo}" description="{jsonModel>/SiparisTanim}" showValueHelp="true" valueHelpRequest="_prepareValueHelpDialog($event, 'SiparisNo')" required="true" visible="{jsonModel>/SiparisNoVisibility}" submit="onSiparisNoInputSubmit"/>
+                <Label text="{i18n>PYP}" design="Bold" visible="{jsonModel>/PypVisibility}"/>
+                <Input value="{jsonModel>/Header/Pyp}" editable="{jsonModel>/PypEditable}" visible="{jsonModel>/PypVisibility}" showValueHelp="true" valueHelpRequest="_prepareValueHelpDialog($event, 'PypSH')"/>
+            </form:SimpleForm>
+        </content>
+        <buttons>
+            <Button text="{i18n>IPTAL}" press="_cancelKullaniciGirisiDialog($event)"></Button>
+            <Button text="{i18n>ONAYLA}" press="_confirmKullaniciGirisiDialog($event)"></Button>
+        </buttons>
+    </Dialog>
+</c:FragmentDefinition>

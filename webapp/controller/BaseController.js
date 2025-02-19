@@ -113,6 +113,21 @@ sap.ui.define([
             this._jsonModel.setProperty("/Header", models.createJSONModel().getData().Header);
         },
 
+        _getUserWarehouse: function () {
+            let that = this,
+                sPath = this._oDataModel.createKey("/KullaniciDepoBulSet", {
+                    Uname: this._userId
+                });
+
+            this._readData(sPath, this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/Lgort", oData.Lgort)
+                that._jsonModel.setProperty("/Lgnum", oData.Lgnum)
+                that._jsonModel.setProperty("/Werks", oData.Werks)
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+
         _getHareketTuru: function () {
             let that = this;
             this._readMultiData("/HareketTuruSHSet", [], this._oDataModel).then((oData) => {
@@ -160,6 +175,42 @@ sap.ui.define([
             })
         },
 
+        _getMatnr: function () {
+            let that = this;
+            this._readMultiData("/MalzemeSHSet", [new Filter("IvUname", "EQ", this._userId)], this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/MalzemeSH", oData.results);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+        _getCharg: function () {
+            let that = this;
+            this._readMultiData("/PartiSHSet", [new Filter("IvUname", "EQ", this._userId)], this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/PartiSH", oData.results);
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+
+        _getRafAddress: function (sMatnr, sCharg, sPyp, sHareketTuru) {
+            let that = this,
+                aFilters = [
+                    new Filter("Matnr", FilterOperator.EQ, sMatnr),
+                    new Filter("Charg", FilterOperator.EQ, sCharg),
+                    new Filter("IvPyp", FilterOperator.EQ, sPyp),
+                    new Filter("IvHareketTuru", FilterOperator.EQ, sHareketTuru),
+                    new Filter("IvLgort", FilterOperator.EQ, this._jsonModel.getData().Lgort)
+                ];
+
+            this._readMultiData("/RafAdresGetirSet", aFilters, this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/KaynakDepoAdresiSH", oData.results)
+            }).catch((oError) => {
+                MessageBox.error(JSON.parse(oError.responseText).error.message.value)
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide()
+            })
+        },
+
         _getItems: function () {
             let that = this,
                 aFilters = [
@@ -180,11 +231,11 @@ sap.ui.define([
             let that = this,
                 sPath = this._oDataModel.createKey("/BarkodOkutSet", {
                     IvBarkod: sBarcode,
-                    IvKlgpla: oKaynakDepo,
-                    IvLgtyp: oLgtyp,
-                    IvHareketTuru: sHareketTuru
+                    IvKlgpla: oKaynakDepo ? oKaynakDepo : "",
+                    IvLgtyp: oLgtyp ? oLgtyp : "",
+                    IvHareketTuru: sHareketTuru ? sHareketTuru : ""
                 });
-                
+
             this._readData(sPath, this._oDataModel).then((oData) => {
                 that._jsonModel.setProperty("/Header/Barkod", oData.IvBarkod)
                 that._jsonModel.setProperty("/Header/Matnr", oData.EvMatnr)
@@ -192,13 +243,16 @@ sap.ui.define([
                 that._jsonModel.setProperty("/Header/Charg", oData.EvCharg)
                 that._jsonModel.setProperty("/Header/Pyp", oData.EvPyp)
                 that._jsonModel.setProperty("/Xchpf", oData.EvXchpf)
-                that._jsonModel.setProperty("/Header/StokBilgi", oData.EvVerme)
+                // that._jsonModel.setProperty("/Header/StokBilgi", oData.EvVerme)
                 that._jsonModel.setProperty("/Header/Meins", oData.EvMeins)
-                that._jsonModel.setProperty("/Lgort", oData.EvLgort)
+                // that._jsonModel.setProperty("/Lgort", oData.EvLgort)
 
                 if (oData.EvPyp !== "") {
                     that._jsonModel.setProperty("/PypVisibility", true)
                 }
+
+                that._getRafAddress(oData.EvMatnr, oData.EvCharg, oData.EvPyp, sHareketTuru)
+                that._focusInput("idKaynakDepoAdresiInput", 300)
 
             }).catch((oError) => {
                 this._jsonModel.setProperty("/Header/Barkod", "")
@@ -224,8 +278,8 @@ sap.ui.define([
                     Charg: oHeaderData.Charg,
                     PsPspnr: oHeaderData.Pyp,
                     Kostl: oHeaderData.Pyp_MasrafYeri,
-                    Verme: oHeaderData.StokBilgi,
-                    Menge: oHeaderData.Menge,
+                    Verme: parseFloat(oHeaderData.StokBilgi).toFixed(2),
+                    Menge: parseFloat(oHeaderData.Menge).toFixed(2),
                     Meins: oHeaderData.Meins,
                     Bwart: oHeaderData.HareketTuru.slice(-1) === "Q" ? oHeaderData.HareketTuru.slice(0, -1) : oHeaderData.HareketTuru,
                     Aufnr: this._jsonModel.getData().SiparisNo,
@@ -250,6 +304,7 @@ sap.ui.define([
             }).finally(() => {
                 sap.ui.core.BusyIndicator.hide()
                 this._getItems()
+                this._focusInput("idBarkodInput", 200)
             })
         },
 
@@ -321,6 +376,87 @@ sap.ui.define([
             })
         },
 
+        _getAdresStok: function (aMatnr, aCharg, sHareketTuru) {
+            let that = this,
+                aFilter = [
+                    new Filter("IvLgort", FilterOperator.EQ, this._jsonModel.getData().Lgort),
+                    new Filter("IvHareketTuru", FilterOperator.EQ, sHareketTuru),
+                ];
+
+            aMatnr.forEach((item) => {
+                aFilter.push(new Filter("Matnr", FilterOperator.EQ, item.getText()))
+            })
+
+            aCharg.forEach((item) => {
+                aFilter.push(new Filter("Charg", FilterOperator.EQ, item.getText()))
+            })
+
+            this._readMultiData("/AdresStokGetirSet", aFilter, this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/AdresStokVeMalzeme", oData.results)
+                that._jsonModel.setProperty("/AdresStokVeMalzemeBackup", JSON.parse(JSON.stringify(oData.results)))
+            }).catch((oError) => {
+                if (oError) {
+                    MessageBox.error(JSON.parse(oError.responseText).error.message.value);
+                }
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+
+        _addMultiBarcode: function (aItems) {
+            let that = this,
+                oEntry = {
+                    Type: "",
+                    NavToEkleMessage: [],
+                    NavToEkleItem: []
+                };
+
+            aItems.forEach((item) => {
+                let sSiparisTanim = this._jsonModel.getData().SiparisNoSH.find((item2) => {
+                    return item2.Aufnr === item.Siparis;
+                })
+                let oItem = {
+                    Werks: this._jsonModel.getData().Werks,
+                    Lgort: this._jsonModel.getData().Lgort,
+                    Lgpla: item.Lgpla,
+                    Lgtyp: item.Lgtyp,
+                    Matnr: item.Matnr,
+                    Maktx: item.Maktx,
+                    Charg: item.Charg,
+                    PsPspnr: item.Pyp ? item.Pyp : "",
+                    Kostl: item.MasrafYeri ? item.MasrafYeri : "",
+                    Menge: parseFloat(item.Verme).toFixed(2),
+                    Meins: item.Meins,
+                    Bwart: this._jsonModel.getData().Header.HareketTuru.slice(-1) === "Q" ? this._jsonModel.getData().Header.HareketTuru.slice(0, -1) : this._jsonModel.getData().Header.HareketTuru,
+                    Aufnr: item.Siparis ? item.Siparis : "",
+                    Sobkz: this._jsonModel.getData().Header.HareketTuru.slice(-1) === "Q" ? "Q" : "",
+                    Ktext: sSiparisTanim ? sSiparisTanim.Ktext : ""
+                }
+                oEntry.NavToEkleItem.push(oItem)
+            })
+
+            this._createData("/BarkodEkleCokluReturnSet", oEntry, this._oDataModel).then((oData) => {
+                oData.NavToEkleMessage.results[0].Type === "S" ? MessageBox.success(oData.NavToEkleMessage.results[0].Message, {
+                    actions: MessageBox.Action.CLOSE, onClose: function () {
+                        that._oMatnrInput.destroyTokens()
+                        that._oChargInput.destroyTokens()
+                        that._focusInput("idMatnrInput", 200)
+                        that._jsonModel.setProperty("/HedefDepoAdresiSH", [])
+                    }
+                }) : MessageBox.error(oData.NavToEkleMessage.results[0].Message);
+            }).catch((oError) => {
+                if (oError) {
+                    MessageBox.error(JSON.parse(oError.responseText).error.message.value);
+                }
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+                this._getItems()
+            })
+        },
+        _closeDialog: function (oEvent) {
+            oEvent.getSource().getParent().getParent().close()
+        },
+
         _prepareValueHelpDialog: function (oEvent, fragmentName) {
             this._valueHelpInput = oEvent.getSource();
             this._valueHelpDialog = sap.ui.xmlfragment(this.getView().getId(), "com.btc.zwmtuketimhareketleri.view.Fragments.ValueHelp." + fragmentName, this);
@@ -349,6 +485,8 @@ sap.ui.define([
                 new Filter("Aufnr", FilterOperator.Contains, sValue),
                 new Filter("Posid", FilterOperator.Contains, sValue),
                 new Filter("Post1", FilterOperator.Contains, sValue),
+                new Filter("Matnr", FilterOperator.Contains, sValue),
+                new Filter("Charg", FilterOperator.Contains, sValue)
             ], false);
             var oBinding = oEvent.getSource().getBinding("items");
             oBinding.filter([oFilter]);
@@ -358,7 +496,9 @@ sap.ui.define([
             var sDescription,
                 sTitle,
                 sType,
+                that = this,
                 oSelectedItem = oEvent.getParameter("selectedItem"),
+                oSelectedItems = oEvent.getParameter("selectedItems"),
                 sInputId = this._valueHelpInput.getId();
             oEvent.getSource().getBinding("items").filter([]);
             if (!oSelectedItem) {
@@ -370,7 +510,8 @@ sap.ui.define([
 
             if (sInputId.includes("idKaynakDepoAdresiInput")) {
                 this._jsonModel.setProperty("/Lgtyp", sType);
-                this._focusInput("idBarkodInput", 200)
+                this._jsonModel.setProperty("/Header/StokBilgi", sDescription);
+                this._focusInput("idPypMasrafYeriInput", 200)
 
                 setTimeout(() => {
                     this._getItems();
@@ -393,13 +534,24 @@ sap.ui.define([
 
                 sTitle === "221" || sTitle === "A09" || sTitle === "A30" ? [this._jsonModel.setProperty("/PypEditable", true), this._jsonModel.setProperty("/PypVisibility", true)] : [this._jsonModel.setProperty("/PypEditable", false), this._jsonModel.setProperty("/PypVisibility", false)]
 
-                this._focusInput("idKaynakDepoAdresiInput", 200)
+                this._focusInput("idBarkodInput", 200)
+                this._jsonModel.setProperty("/BarkodEditable", true)
             }
 
             sInputId.includes("idPypMasrafYeriInput") && this._jsonModel.getData().SiparisNoVisibility ? this._focusInput("idSiparisNoInput", 200) : sInputId.includes("idPypMasrafYeriInput") && !this._jsonModel.getData().SiparisNoVisibility ? this._focusInput("idMiktarInput", 200) : ""
             sInputId.includes("idSiparisNoInput") ? this._focusInput("idMiktarInput", 200) : ""
-            this._valueHelpInput.setValue(sTitle);
-            this._valueHelpInput.setDescription(sDescription);
+
+            if (sInputId.includes("idMatnrInput") || sInputId.includes("idChargInput")) {
+                oSelectedItems.forEach((item) => {
+                    that._valueHelpInput.addToken(new sap.m.Token({
+                        text: item.getTitle()
+                    }));
+                });
+
+            } else {
+                this._valueHelpInput.setValue(sTitle);
+                this._valueHelpInput.setDescription(sDescription);
+            }
         },
 
         onSelectDialogCancel: function (oEvent) {
