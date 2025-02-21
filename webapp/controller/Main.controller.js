@@ -6,10 +6,10 @@ sap.ui.define([
     "com/btc/zwmtuketimhareketleri/model/formatter"
 ],
     function (Controller,
-	BaseController,
-	MessageBox,
-	MessageToast,
-	formatter) {
+        BaseController,
+        MessageBox,
+        MessageToast,
+        formatter) {
         "use strict";
 
         return BaseController.extend("com.btc.zwmtuketimhareketleri.controller.Main", {
@@ -281,7 +281,7 @@ sap.ui.define([
                     return MessageToast.show(this.getResourceBundle().getText("SECIM_YAPILMADI"));
                 }
 
-                this._jsonModel.setProperty("/Header/KaynakDepoAdresi",aSelectedItemsData[0].Lgpla);
+                this._jsonModel.setProperty("/Header/KaynakDepoAdresi", aSelectedItemsData[0].Lgpla);
 
                 this._kullaniciGiris = sap.ui.xmlfragment(this.getView().getId(), "com.btc.zwmtuketimhareketleri.view.Fragments.Dialog.KullaniciGirisi", this);
                 this.getView().addDependent(this._kullaniciGiris);
@@ -295,11 +295,14 @@ sap.ui.define([
                 let sMasrafYeri = oEvent.oSource.getParent().getContent()[0].getContent()[1].getValue(),
                     sSiparis = oEvent.oSource.getParent().getContent()[0].getContent()[3].getValue(),
                     sPyp = oEvent.oSource.getParent().getContent()[0].getContent()[5].getValue();
+                debugger;
 
                 this._multiSelectedItems.forEach((item) => {
                     item.MasrafYeri = sMasrafYeri;
                     item.Siparis = sSiparis;
-                    sPyp ? item.Pyp : null
+                    if (sPyp) {
+                        item.Pyp = sPyp;
+                    }
                 })
 
                 oEvent.oSource.getParent().close();

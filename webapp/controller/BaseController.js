@@ -204,6 +204,10 @@ sap.ui.define([
 
             this._readMultiData("/RafAdresGetirSet", aFilters, this._oDataModel).then((oData) => {
                 that._jsonModel.setProperty("/KaynakDepoAdresiSH", oData.results)
+                if (oData.results.length === 1) {
+                    that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oData.results[0].Lgpla)
+                    that._jsonModel.setProperty("/Header/StokBilgi", oData.results[0].Verme)
+                }
             }).catch((oError) => {
                 MessageBox.error(JSON.parse(oError.responseText).error.message.value)
             }).finally(() => {
@@ -214,7 +218,7 @@ sap.ui.define([
         _getItems: function () {
             let that = this,
                 aFilters = [
-                    new Filter("IvKlgpla", FilterOperator.EQ, this._jsonModel.getData().Header.KaynakDepoAdresi)
+                    new Filter("IvUname", FilterOperator.EQ, this._userId)
                 ];
 
             this._readMultiData("/KalemGetirSet", aFilters, this._oDataModel).then((oData) => {
@@ -288,13 +292,15 @@ sap.ui.define([
                 }),
                 sHareketTuru = oHeaderData.HareketTuru,
                 sHareketTuruTanim = oHeaderData.HareketTuruTanim,
-                oKaynakDepo = oHeaderData.KaynakDepoAdresi;
+                oKaynakDepo = oHeaderData.KaynakDepoAdresi,
+                sStokBilgi = oHeaderData.StokBilgi;
 
             this._readData(sPath, this._oDataModel).then((oData) => {
                 that._clearHeader()
                 that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oKaynakDepo);
                 that._jsonModel.setProperty("/Header/HareketTuru", sHareketTuru);
                 that._jsonModel.setProperty("/Header/HareketTuruTanim", sHareketTuruTanim);
+                that._jsonModel.setProperty("/Header/StokBilgi", sStokBilgi);
 
                 that._jsonModel.setProperty("/SiparisNo", "")
                 that._jsonModel.setProperty("/SiparisTanim", "")
@@ -548,6 +554,8 @@ sap.ui.define([
                     }));
                 });
 
+            } else if (sInputId.includes("idKaynakDepoAdresiInput")) {
+                this._valueHelpInput.setValue(sTitle);
             } else {
                 this._valueHelpInput.setValue(sTitle);
                 this._valueHelpInput.setDescription(sDescription);
