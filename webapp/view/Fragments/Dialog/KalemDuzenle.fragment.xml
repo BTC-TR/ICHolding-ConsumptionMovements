@@ -1,0 +1,30 @@
+<c:FragmentDefinition xmlns="sap.m"
+    xmlns:c="sap.ui.core"
+    xmlns:f="sap.ui.layout.form">
+    <Dialog showHeader="false">
+        <content>
+            <f:SimpleForm editable="true" layout="ResponsiveGridLayout" backgroundDesign="Solid">
+                <f:content>
+                    <Label text="{i18n>KAYNAK_DEPO_ADRESI}" design="Bold"></Label>
+                    <Input value="{jsonModel>/EditedData/Lgpla}" editable="false"/>
+                    <Label text="{i18n>MALZEME}" design="Bold"></Label>
+                    <Input value="{jsonModel>/EditedData/Matnr}" editable="false"/>
+                    <Label text="{i18n>MALZEME_TANIMI}" design="Bold"></Label>
+                    <Input value="{jsonModel>/EditedData/Maktx}" editable="false"/>
+                    <Label text="{i18n>PYP_MASRAF_YERI}" design="Bold"></Label>
+                    <Input value="{jsonModel>/EditedData/PsPspnr} / {jsonModel>/EditedData/Kostl}" editable="false"/>
+                    <Label text="{i18n>PARTI}" design="Bold"></Label>
+                    <Input value="{jsonModel>/EditedData/Charg}" editable="false"/>
+                    <Label text="{i18n>SIPARIS_NO}" design="Bold"/>
+                    <Input value="{jsonModel>/EditedData/Aufnr}" editable="false"/>
+                    <Label text="{i18n>MIKTAR_VE_BIRIM}" design="Bold"></Label>
+                    <Input value="{path:'jsonModel>/EditedData/Menge'}" description="{jsonModel>/EditedData/Meins}" submit="onKaydetButtonEditPress"/>
+                </f:content>
+            </f:SimpleForm>
+        </content>
+        <buttons>
+            <Button text="{i18n>IPTAL}" press="onIptalButtonPress"></Button>
+            <Button text="{i18n>KAYDET}" press="onKaydetButtonEditPress"></Button>
+        </buttons>
+    </Dialog>
+</c:FragmentDefinition>

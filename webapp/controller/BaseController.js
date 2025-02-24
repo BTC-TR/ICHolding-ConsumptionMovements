@@ -197,7 +197,7 @@ sap.ui.define([
                 aFilters = [
                     new Filter("Matnr", FilterOperator.EQ, sMatnr),
                     new Filter("Charg", FilterOperator.EQ, sCharg),
-                    new Filter("IvPyp", FilterOperator.EQ, sPyp),
+                    new Filter("IvPyp", FilterOperator.EQ, sPyp === "" ? "0" : sPyp),
                     new Filter("IvHareketTuru", FilterOperator.EQ, sHareketTuru),
                     new Filter("IvLgort", FilterOperator.EQ, this._jsonModel.getData().Lgort)
                 ];
@@ -207,6 +207,10 @@ sap.ui.define([
                 if (oData.results.length === 1) {
                     that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oData.results[0].Lgpla)
                     that._jsonModel.setProperty("/Header/StokBilgi", oData.results[0].Verme)
+                    that._jsonModel.setProperty("/Lgtyp", oData.results[0].Lgtyp)
+                    that._focusInput("idPypMasrafYeriInput", 200)
+                } else {
+                    that._focusInput("idKaynakDepoAdresiInput", 200)
                 }
             }).catch((oError) => {
                 MessageBox.error(JSON.parse(oError.responseText).error.message.value)
@@ -256,7 +260,6 @@ sap.ui.define([
                 }
 
                 that._getRafAddress(oData.EvMatnr, oData.EvCharg, oData.EvPyp, sHareketTuru)
-                that._focusInput("idKaynakDepoAdresiInput", 300)
 
             }).catch((oError) => {
                 this._jsonModel.setProperty("/Header/Barkod", "")
@@ -297,10 +300,10 @@ sap.ui.define([
 
             this._readData(sPath, this._oDataModel).then((oData) => {
                 that._clearHeader()
-                that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oKaynakDepo);
+                // that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oKaynakDepo);
                 that._jsonModel.setProperty("/Header/HareketTuru", sHareketTuru);
                 that._jsonModel.setProperty("/Header/HareketTuruTanim", sHareketTuruTanim);
-                that._jsonModel.setProperty("/Header/StokBilgi", sStokBilgi);
+                // that._jsonModel.setProperty("/Header/StokBilgi", sStokBilgi);
 
                 that._jsonModel.setProperty("/SiparisNo", "")
                 that._jsonModel.setProperty("/SiparisTanim", "")
@@ -349,6 +352,7 @@ sap.ui.define([
                     IvBelgeTarihi: this._jsonModel.getData().BelgeTarihi,
                     IvBelgeMetni: this._jsonModel.getData().BelgeMetni,
                     IvFis: this._jsonModel.getData().MalzemeFisi,
+                    IvKalemMetni: this._jsonModel.getData().KalemMetni,
                     NavToKaydetMessage: []
                 },
                 aGuids = [];
@@ -373,6 +377,7 @@ sap.ui.define([
                         that._jsonModel.setProperty("/BelgeTarihi", undefined)
                         that._jsonModel.setProperty("/MalzemeFisi", "")
                         that._jsonModel.setProperty("/BelgeMetni", "")
+                        that._jsonModel.setProperty("/KalemMetni", "")
                     }
                 }) : MessageBox.error(oData.NavToKaydetMessage.results[0].Message)
             }).catch((oError) => {
@@ -459,6 +464,49 @@ sap.ui.define([
                 this._getItems()
             })
         },
+
+        _editRow: function (oRowData) {
+            let that = this,
+                sPath = this._oDataModel.createKey("/TransferGuncelleSet", {
+                    Guid: oRowData.Guid,
+                    Menge: parseFloat(oRowData.Menge).toFixed(2)
+                });
+
+            this._readData(sPath, this._oDataModel).then((oData) => {
+                sap.m.MessageToast.show(oData.Message);
+                this._kalemDuzenle.close();
+                that._getItems();
+            }).catch((oError) => {
+                if (oError) {
+                    sap.m.MessageBox.error(JSON.parse(oError.responseText).error.message.value);
+                }
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
+
+        _getEditedStock: function (oEditedData) {
+            let that = this,
+                aFilter = [
+                    new Filter("Charg", FilterOperator.EQ, oEditedData.Charg),
+                    new Filter("Matnr", FilterOperator.EQ, oEditedData.Matnr),
+                    new Filter("IvHareketTuru", FilterOperator.EQ, oEditedData.Bwart + oEditedData.Sobkz),
+                    new Filter("IvLgort", FilterOperator.EQ, this._jsonModel.getData().Lgort),
+                    new Filter("IvLgpla", FilterOperator.EQ, oEditedData.Lgpla),
+                    new Filter("IvLgtyp", FilterOperator.EQ, oEditedData.Lgtyp),
+                    new Filter("IvPyp", FilterOperator.EQ, oEditedData.PsPspnr),
+                ];
+
+            this._readMultiData("/GuncellenenDataStockSet", aFilter, this._oDataModel).then((oData) => {
+                oData.results.length !== 0 ? that._jsonModel.setProperty("/EditedDataStock", oData.results[0].Verme) : null
+            }).catch((oError) => {
+                if (oError) {
+                    MessageBox.error(JSON.parse(oError.responseText).error.message.value);
+                }
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide();
+            })
+        },
         _closeDialog: function (oEvent) {
             oEvent.getSource().getParent().getParent().close()
         },
@@ -492,7 +540,8 @@ sap.ui.define([
                 new Filter("Posid", FilterOperator.Contains, sValue),
                 new Filter("Post1", FilterOperator.Contains, sValue),
                 new Filter("Matnr", FilterOperator.Contains, sValue),
-                new Filter("Charg", FilterOperator.Contains, sValue)
+                new Filter("Charg", FilterOperator.Contains, sValue),
+                new Filter("Maktx", FilterOperator.Contains, sValue)
             ], false);
             var oBinding = oEvent.getSource().getBinding("items");
             oBinding.filter([oFilter]);

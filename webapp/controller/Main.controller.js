@@ -34,12 +34,12 @@ sap.ui.define([
                 this._getPyp();
                 this._getMatnr()
                 this._getCharg()
-
+                this._getItems()
                 this._focusInput("idHareketTuruInput", 300);
             },
 
             onSlaytSwitchChange: function (oEvent) {
-                oEvent.getParameter("state") ? [this._jsonModel.setProperty("/Visibility/SlaytB", true), this._jsonModel.setProperty("/Visibility/SlaytA", false), this._focusInput("idMatnrInput", 200), this._clearHeader()] : [this._jsonModel.setProperty("/Visibility/SlaytB", false), this._jsonModel.setProperty("/Visibility/SlaytA", true), this._focusInput("idBarkodInput", 200), this._oChargInput.destroyTokens(), this._oMatnrInput.destroyTokens()]
+                oEvent.getParameter("state") ? [this._jsonModel.setProperty("/Visibility/SlaytB", true), this._jsonModel.setProperty("/Visibility/SlaytA", false), this._focusInput("idMatnrInput", 200), this._clearHeader()] : [this._jsonModel.setProperty("/Visibility/SlaytB", false), this._jsonModel.setProperty("/Visibility/SlaytA", true), this._focusInput("idHareketTuruInput", 200), this._oChargInput.destroyTokens(), this._oMatnrInput.destroyTokens()]
             },
 
             onHareketTuruInputSubmit: function (oEvent) {
@@ -171,7 +171,7 @@ sap.ui.define([
                 }
 
                 if (parseInt(oHeaderData.Menge) > parseInt(oHeaderData.StokBilgi)) {
-                    return MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ"))
+                    return MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ", oHeaderData.StokBilgi))
                 }
 
                 this._addBarcode(this._jsonModel.getData().Header);
@@ -180,12 +180,11 @@ sap.ui.define([
 
             onTemizleButtonPress: function () {
                 this._clearHeader();
-                this._focusInput("idBarkodInput", 300);
-
                 this._jsonModel.setProperty("/SiparisNoVisibility", false)
                 this._jsonModel.setProperty("/SiparisNo", "")
                 this._jsonModel.setProperty("/SiparisTanim", "")
                 this._jsonModel.setProperty("/PypEditable", false)
+                this._focusInput("idHareketTuruInput", 200)
 
                 this._getItems()
             },
@@ -281,7 +280,7 @@ sap.ui.define([
                     return MessageToast.show(this.getResourceBundle().getText("SECIM_YAPILMADI"));
                 }
 
-                this._jsonModel.setProperty("/Header/KaynakDepoAdresi", aSelectedItemsData[0].Lgpla);
+                // this._jsonModel.setProperty("/Header/KaynakDepoAdresi", aSelectedItemsData[0].Lgpla);
 
                 this._kullaniciGiris = sap.ui.xmlfragment(this.getView().getId(), "com.btc.zwmtuketimhareketleri.view.Fragments.Dialog.KullaniciGirisi", this);
                 this.getView().addDependent(this._kullaniciGiris);
@@ -295,7 +294,6 @@ sap.ui.define([
                 let sMasrafYeri = oEvent.oSource.getParent().getContent()[0].getContent()[1].getValue(),
                     sSiparis = oEvent.oSource.getParent().getContent()[0].getContent()[3].getValue(),
                     sPyp = oEvent.oSource.getParent().getContent()[0].getContent()[5].getValue();
-                debugger;
 
                 this._multiSelectedItems.forEach((item) => {
                     item.MasrafYeri = sMasrafYeri;
@@ -308,6 +306,33 @@ sap.ui.define([
                 oEvent.oSource.getParent().close();
                 this._addMultiBarcode(this._multiSelectedItems);
                 this._adresStok.close();
-            }
+            },
+            onEditButtonPress: function (oEvent) {
+                if (!this._kalemDuzenle) {
+                    this._kalemDuzenle = sap.ui.xmlfragment(this.getView().getId(), "com.btc.zwmtuketimhareketleri.view.Fragments.Dialog.KalemDuzenle", this);
+                    this.getView().addDependent(this._kalemDuzenle);
+                }
+                this._kalemDuzenle.open();
+                this._editedRowData = oEvent.getSource().getBindingContext("jsonModel").getObject();
+                this._jsonModel.setProperty("/EditedData", this._editedRowData);
+
+                this._getEditedStock(this._editedRowData);
+                setTimeout(() => {
+                    this._kalemDuzenle.getContent()[0].getContent()[13].focus();
+                }, 300);
+            },
+
+            onKaydetButtonEditPress: function (oEvent) {
+                var deger1 = Number(this._editedRowData.Menge.replace(",", ".")).toFixed(2);
+                if (parseInt(deger1) > parseInt(this._jsonModel.getData().EditedDataStock)) {
+                    return MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ", this._jsonModel.getData().EditedDataStock))
+                }
+                this._editRow(this._editedRowData);
+            },
+
+            onIptalButtonPress: function (oEvent) {
+                oEvent.getSource().getParent().close();
+                this._getItems();
+            },
         });
     });

@@ -27,6 +27,8 @@
 			<Column minScreenWidth="Tablet" demandPopin="true">
 				<Label text="{i18n>SIPARIS_NO}" design="Bold" wrapping="true"></Label>
 			</Column>
+			<Column minScreenWidth="Tablet" demandPopin="true">
+			</Column>
 		</columns>
 		<ColumnListItem >
 			<cells>
@@ -36,6 +38,7 @@
 				<ObjectStatus text="{jsonModel>PsPspnr} / {jsonModel>Kostl}" state="Warning"></ObjectStatus>
 				<ObjectNumber number="{path:'jsonModel>Menge', formatter:'.formatter.numberUnit'}" unit="{jsonModel>Meins}" state="Error"></ObjectNumber>
 				<ObjectStatus text="{jsonModel>Aufnr}" state="Information"></ObjectStatus>
+				<Button icon="sap-icon://edit" press="onEditButtonPress"></Button>
 			</cells>
 		</ColumnListItem>
 	</Table>

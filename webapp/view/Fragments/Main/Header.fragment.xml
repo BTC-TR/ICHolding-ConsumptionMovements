@@ -35,9 +35,9 @@
             <Label text="{i18n>HAREKET_TURU}" design="Bold"></Label>
             <Input id="idHareketTuruInputSlaytB" value="{jsonModel>/Header/HareketTuru}" description="{jsonModel>/Header/HareketTuruTanim}" submit="onHareketTuruInputSubmit" change="onHareketTuruInputSubmit" showValueHelp="true" valueHelpRequest="_prepareValueHelpDialog($event, 'HareketTuru')" required="true"/>
             <Label text="{i18n>MALZEME}"></Label>
-            <MultiInput id="idMatnrInput" value="{jsonModel>/DetailView/Matnr}" valueHelpRequest="_prepareValueHelpDialog($event, 'MalzemeSH')" submit="onMatnrInputSubmit" required="true" showValueHelp="true" change="onMatnrInputChange" />
+            <MultiInput id="idMatnrInput" value="{jsonModel>/DetailView/Matnr}" valueHelpRequest="_prepareValueHelpDialog($event, 'MalzemeSH')" submit="onMatnrInputSubmit" required="true" showValueHelp="true" change="onMatnrInputChange" valueHelpOnly="true"/>
             <Label text="{i18n>PARTI}"></Label>
-            <MultiInput id="idChargInput" value="{jsonModel>/DetailView/Charg}" valueHelpRequest="_prepareValueHelpDialog($event, 'PartiSH')" submit="onChargInputSubmit" required="true" showValueHelp="true" change="onChargInputChange"/>
+            <MultiInput id="idChargInput" value="{jsonModel>/DetailView/Charg}" valueHelpRequest="_prepareValueHelpDialog($event, 'PartiSH')" submit="onChargInputSubmit" required="true" showValueHelp="true" change="onChargInputChange" valueHelpOnly="true"/>
             <Button text="{i18n>STOK_SORGU}" press="onAddButtonPress" type="Ghost"></Button>
         </form:SimpleForm>
     </FlexBox>

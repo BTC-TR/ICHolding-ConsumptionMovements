@@ -11,6 +11,8 @@
 
                 <Label text="{i18n>MALZEME_FISI}" design="Bold"/>
                 <TextArea value="{jsonModel>/MalzemeFisi}" maxLength="16"></TextArea>
+                <Label text="{i18n>KALEM_METNI}" design="Bold"/>
+                <TextArea value="{jsonModel>/KalemMetni}" maxLength="35"></TextArea>
             </form:SimpleForm >
         </content>
         <buttons>
