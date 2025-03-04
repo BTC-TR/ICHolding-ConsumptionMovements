@@ -38,7 +38,7 @@
                             <ObjectStatus text="{jsonModel>Charg}" state="Success"></ObjectStatus>
                             <ObjectStatus text="{jsonModel>Pyp}" state="Warning"></ObjectStatus>
                             <ObjectStatus text="{jsonModel>Lgpla}" state="Information"></ObjectStatus>
-                            <Input value="{parts:[{path:'jsonModel>Verme'}, {path:'jsonModel>Meins'}], type:'sap.ui.model.type.Currency', formatOptions:{showMeasure: false}}" description="{jsonModel>Meins}" submit="onVermeInputChange" width="100%"></Input>
+                            <Input value="{parts:[{path:'jsonModel>Verme'}, {path:'jsonModel>Meins'}], type:'sap.ui.model.type.Currency', formatOptions:{showMeasure: false}}" description="{jsonModel>Meins}" change="onVermeInputChange" width="100%"></Input>
                         </cells>
                     </ColumnListItem>
                 </items>

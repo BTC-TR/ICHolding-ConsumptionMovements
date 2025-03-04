@@ -36,7 +36,7 @@
 				<ObjectIdentifier title="{jsonModel>Matnr}" text="{jsonModel>Maktx}" titleActive="true"></ObjectIdentifier>
 				<ObjectStatus text="{jsonModel>Charg}" state="Success"></ObjectStatus>
 				<ObjectStatus text="{jsonModel>PsPspnr} / {jsonModel>Kostl}" state="Warning"></ObjectStatus>
-				<ObjectNumber number="{path:'jsonModel>Menge', formatter:'.formatter.numberUnit'}" unit="{jsonModel>Meins}" state="Error"></ObjectNumber>
+				<ObjectNumber number="{parts:[{path:'jsonModel>Menge'}, {path:'jsonModel>Meins'}], type:'sap.ui.model.type.Currency', formatOptions:{showMeasure: false}}" unit="{jsonModel>Meins}" state="Error"></ObjectNumber>
 				<ObjectStatus text="{jsonModel>Aufnr}" state="Information"></ObjectStatus>
 				<Button icon="sap-icon://edit" press="onEditButtonPress"></Button>
 			</cells>

@@ -113,21 +113,6 @@ sap.ui.define([
             this._jsonModel.setProperty("/Header", models.createJSONModel().getData().Header);
         },
 
-        _getUserWarehouse: function () {
-            let that = this,
-                sPath = this._oDataModel.createKey("/KullaniciDepoBulSet", {
-                    Uname: this._userId
-                });
-
-            this._readData(sPath, this._oDataModel).then((oData) => {
-                that._jsonModel.setProperty("/Lgort", oData.Lgort)
-                that._jsonModel.setProperty("/Lgnum", oData.Lgnum)
-                that._jsonModel.setProperty("/Werks", oData.Werks)
-            }).finally(() => {
-                sap.ui.core.BusyIndicator.hide();
-            })
-        },
-
         _getHareketTuru: function () {
             let that = this;
             this._readMultiData("/HareketTuruSHSet", [], this._oDataModel).then((oData) => {
@@ -198,9 +183,12 @@ sap.ui.define([
                     new Filter("Matnr", FilterOperator.EQ, sMatnr),
                     new Filter("Charg", FilterOperator.EQ, sCharg),
                     new Filter("IvPyp", FilterOperator.EQ, sPyp === "" ? "0" : sPyp),
-                    new Filter("IvHareketTuru", FilterOperator.EQ, sHareketTuru),
-                    new Filter("IvLgort", FilterOperator.EQ, this._jsonModel.getData().Lgort)
+                    new Filter("IvHareketTuru", FilterOperator.EQ, sHareketTuru)
                 ];
+
+            this._jsonModel.getData().SeciliDepoYerleri.forEach((item) => {
+                aFilters.push(new Filter("Lgort", "EQ", item))
+            })
 
             this._readMultiData("/RafAdresGetirSet", aFilters, this._oDataModel).then((oData) => {
                 that._jsonModel.setProperty("/KaynakDepoAdresiSH", oData.results)
@@ -208,12 +196,32 @@ sap.ui.define([
                     that._jsonModel.setProperty("/Header/KaynakDepoAdresi", oData.results[0].Lgpla)
                     that._jsonModel.setProperty("/Header/StokBilgi", oData.results[0].Verme)
                     that._jsonModel.setProperty("/Lgtyp", oData.results[0].Lgtyp)
+                    that._jsonModel.setProperty("/Lgort", oData.results[0].Lgort)
                     that._focusInput("idPypMasrafYeriInput", 200)
                 } else {
                     that._focusInput("idKaynakDepoAdresiInput", 200)
                 }
             }).catch((oError) => {
                 MessageBox.error(JSON.parse(oError.responseText).error.message.value)
+            }).finally(() => {
+                sap.ui.core.BusyIndicator.hide()
+            })
+        },
+
+        _getDepoYeri: function () {
+            let that = this,
+                aFilter = [
+                    new Filter("IvUser", "EQ", this._userId)
+                ];
+
+            this._readMultiData("/KullaniciDepoBulSet", aFilter, this._oDataModel).then((oData) => {
+                that._jsonModel.setProperty("/DepoYeriSH", oData.results);
+                if (!that._depoYeriDialog) {
+                    that._depoYeriDialog = sap.ui.xmlfragment(that.getView().getId(), "com.btc.zwmtuketimhareketleri.view.Fragments.Dialog.DepoYeriSecimi", that);
+                    that.getView().addDependent(that._depoYeriDialog);
+                }
+                that._depoYeriDialog.open();
+                that._afterFocus(that._depoYeriDialog);
             }).finally(() => {
                 sap.ui.core.BusyIndicator.hide()
             })
@@ -283,10 +291,10 @@ sap.ui.define([
                     Matnr: oHeaderData.Matnr,
                     Maktx: oHeaderData.Maktx,
                     Charg: oHeaderData.Charg,
-                    PsPspnr: oHeaderData.Pyp,
+                    PsPspnr: oHeaderData.Pyp ? oHeaderData.Pyp : "",
                     Kostl: oHeaderData.Pyp_MasrafYeri,
-                    Verme: parseFloat(oHeaderData.StokBilgi).toFixed(2),
-                    Menge: parseFloat(oHeaderData.Menge).toFixed(2),
+                    Verme: oHeaderData.StokBilgi.replace(".","").replace(",","."),
+                    Menge: oHeaderData.Menge.replace(".","").replace(",","."),
                     Meins: oHeaderData.Meins,
                     Bwart: oHeaderData.HareketTuru.slice(-1) === "Q" ? oHeaderData.HareketTuru.slice(0, -1) : oHeaderData.HareketTuru,
                     Aufnr: this._jsonModel.getData().SiparisNo,
@@ -390,9 +398,12 @@ sap.ui.define([
         _getAdresStok: function (aMatnr, aCharg, sHareketTuru) {
             let that = this,
                 aFilter = [
-                    new Filter("IvLgort", FilterOperator.EQ, this._jsonModel.getData().Lgort),
                     new Filter("IvHareketTuru", FilterOperator.EQ, sHareketTuru),
                 ];
+
+            this._jsonModel.getData().SeciliDepoYerleri.forEach((item) => {
+                aFilter.push(new Filter("Lgort", FilterOperator.EQ, item))
+            })
 
             aMatnr.forEach((item) => {
                 aFilter.push(new Filter("Matnr", FilterOperator.EQ, item.getText()))
@@ -427,8 +438,8 @@ sap.ui.define([
                     return item2.Aufnr === item.Siparis;
                 })
                 let oItem = {
-                    Werks: this._jsonModel.getData().Werks,
-                    Lgort: this._jsonModel.getData().Lgort,
+                    Werks: item.Werks,
+                    Lgort: item.Lgort,
                     Lgpla: item.Lgpla,
                     Lgtyp: item.Lgtyp,
                     Matnr: item.Matnr,
@@ -469,7 +480,7 @@ sap.ui.define([
             let that = this,
                 sPath = this._oDataModel.createKey("/TransferGuncelleSet", {
                     Guid: oRowData.Guid,
-                    Menge: parseFloat(oRowData.Menge).toFixed(2)
+                    Menge: oRowData.Menge.replace(".","").replace(",",".")
                 });
 
             this._readData(sPath, this._oDataModel).then((oData) => {
@@ -491,14 +502,18 @@ sap.ui.define([
                     new Filter("Charg", FilterOperator.EQ, oEditedData.Charg),
                     new Filter("Matnr", FilterOperator.EQ, oEditedData.Matnr),
                     new Filter("IvHareketTuru", FilterOperator.EQ, oEditedData.Bwart + oEditedData.Sobkz),
-                    new Filter("IvLgort", FilterOperator.EQ, this._jsonModel.getData().Lgort),
                     new Filter("IvLgpla", FilterOperator.EQ, oEditedData.Lgpla),
                     new Filter("IvLgtyp", FilterOperator.EQ, oEditedData.Lgtyp),
                     new Filter("IvPyp", FilterOperator.EQ, oEditedData.PsPspnr),
+                    new Filter("IvGuid", FilterOperator.EQ, oEditedData.Guid),
                 ];
 
+            this._jsonModel.getData().SeciliDepoYerleri.forEach((item) => {
+                aFilter.push(new Filter("Lgort", "EQ", item))
+            })
+
             this._readMultiData("/GuncellenenDataStockSet", aFilter, this._oDataModel).then((oData) => {
-                oData.results.length !== 0 ? that._jsonModel.setProperty("/EditedDataStock", oData.results[0].Verme) : null
+                oData.results.length !== 0 ? that._jsonModel.setProperty("/EditedDataStock", parseFloat(oData.results[0].Verme).toLocaleString("tr-TR")) : null
             }).catch((oError) => {
                 if (oError) {
                     MessageBox.error(JSON.parse(oError.responseText).error.message.value);
@@ -541,7 +556,9 @@ sap.ui.define([
                 new Filter("Post1", FilterOperator.Contains, sValue),
                 new Filter("Matnr", FilterOperator.Contains, sValue),
                 new Filter("Charg", FilterOperator.Contains, sValue),
-                new Filter("Maktx", FilterOperator.Contains, sValue)
+                new Filter("Maktx", FilterOperator.Contains, sValue),
+                new Filter("Lgort", FilterOperator.Contains, sValue),
+                new Filter("Lgobe", FilterOperator.Contains, sValue)
             ], false);
             var oBinding = oEvent.getSource().getBinding("items");
             oBinding.filter([oFilter]);
@@ -566,8 +583,8 @@ sap.ui.define([
             if (sInputId.includes("idKaynakDepoAdresiInput")) {
                 this._jsonModel.setProperty("/Lgtyp", sType);
                 this._jsonModel.setProperty("/Header/StokBilgi", sDescription);
+                this._jsonModel.setProperty("/Lgort", oSelectedItem.getBindingContext("jsonModel").getObject().Lgort);
                 this._focusInput("idPypMasrafYeriInput", 200)
-
                 setTimeout(() => {
                     this._getItems();
                 }, 300);
@@ -613,6 +630,43 @@ sap.ui.define([
 
         onSelectDialogCancel: function (oEvent) {
             oEvent.getSource()._dialog.close();
+        },
+
+        _selectDepoYeri: function (oEvent) {
+            var sDescription,
+                sTitle,
+                sType,
+                that = this,
+                oSelectedItem = oEvent.getParameter("selectedItem"),
+                oSelectedItems = oEvent.getParameter("selectedItems"),
+                oVbox = this.getView().byId("idMainVbox");
+            oEvent.getSource().getBinding("items").filter([]);
+            if (!oSelectedItem) {
+                return;
+            }
+
+            oVbox.addItem(new sap.m.Label({
+                text: "Seçili Depo Yerleri"
+            }))
+
+            oSelectedItems.forEach((item) => {
+                oVbox.addItem(new sap.m.Label({
+                    text: item.getTitle(),
+                    design: "Bold"
+                }))
+            })
+
+            var aDepoSeciliDepoYerleri = [];
+            oSelectedItems.forEach((item) => {
+                aDepoSeciliDepoYerleri.push(item.getTitle())
+            })
+
+            this._jsonModel.setProperty("/SeciliDepoYerleri", aDepoSeciliDepoYerleri)
+        },
+
+        _cancelDepoYeri: function () {
+            sap.m.URLHelper.redirect(sap.ushell.Container.getFLPUrl(), false);
+            // sap.ui.core.BusyIndicator.show(0)
         }
     });
 });

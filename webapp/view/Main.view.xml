@@ -6,8 +6,7 @@
         <uxap:headerTitle>
             <uxap:ObjectPageDynamicHeaderTitle >
                 <uxap:content>
-                    <VBox
-    >
+                    <VBox id="idMainVbox">
                         <Switch change="onSlaytSwitchChange" customTextOff="A" customTextOn="B"></Switch>
                     </VBox>
                 </uxap:content>

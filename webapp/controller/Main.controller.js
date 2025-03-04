@@ -26,7 +26,7 @@ sap.ui.define([
                 this._oMatnrInput = this.getView().byId("idMatnrInput");
                 this._oChargInput = this.getView().byId("idChargInput");
 
-                this._getUserWarehouse();
+                // this._getUserWarehouse();
                 this._getHareketTuru();
                 // this._getKaynakDepoAdresi();
                 this._getMasrafYeri();
@@ -35,6 +35,7 @@ sap.ui.define([
                 this._getMatnr()
                 this._getCharg()
                 this._getItems()
+                this._getDepoYeri()
                 this._focusInput("idHareketTuruInput", 300);
             },
 
@@ -169,9 +170,12 @@ sap.ui.define([
                 if (this._jsonModel.getData().SiparisNoVisibility && this._jsonModel.getData().SiparisNo === "") {
                     return MessageBox.error(this.getResourceBundle().getText("ZORUNLU_ALANLARI_DOLDURUNUZ"))
                 }
+                if (oHeaderData.Menge === "0") {
+                    return MessageToast.show(this.getResourceBundle().getText("MIKTAR_0_GIRILEMEZ"))
+                }
 
-                if (parseInt(oHeaderData.Menge) > parseInt(oHeaderData.StokBilgi)) {
-                    return MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ", oHeaderData.StokBilgi))
+                if (formatter.compareTwoStringAsFloat(oHeaderData.Menge, oHeaderData.StokBilgi, true)) {
+                    return MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ", formatter.convertStringToFloat(oHeaderData.StokBilgi, true).toLocaleString("tr-TR")))
                 }
 
                 this._addBarcode(this._jsonModel.getData().Header);
@@ -240,18 +244,21 @@ sap.ui.define([
                 this._adresStok.open();
             },
             onVermeInputChange: function (oEvent) {
-                let sValue = oEvent.getParameter("value"),
+                let sValue = oEvent.getSource().getValue(),
                     oRow = oEvent.getSource().getParent().getBindingContext("jsonModel").getObject(),
                     iIndex = oEvent.getSource().getParent().getBindingContextPath().split("/")[2],
-                    sOldMenge = this._jsonModel.getProperty("/AdresStokVeMalzemeBackup/" + iIndex + "/Verme")
+                    sOldMenge = this._jsonModel.getProperty("/AdresStokVeMalzemeBackup/" + iIndex + "/Verme");
 
-                var deger1 = Number(sValue.replace(",", ".")).toFixed(2);
-                // var deger2 = parseFloat(sOldMenge.replace(".", "").replace(".", ",")).toFixed(2);
+                if (sValue === "0,00") {
+                    return MessageToast.show(this.getResourceBundle().getText("MIKTAR_0_GIRILEMEZ"))
+                }
 
-                if (parseInt(deger1) > parseInt(sOldMenge)) {
+                if (formatter.compareTwoStringAsFloat(sValue, sOldMenge, false)) {
                     oEvent.getSource().getParent().setSelected(false);
                     oEvent.getSource().getParent().setHighlight("None");
-                    return sap.m.MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_FAZLA_OLAMAZ"));
+                    oEvent.getSource().setValue("")
+                    oEvent.getSource().focus()
+                    return sap.m.MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ", formatter.convertStringToFloat(sOldMenge, true).toLocaleString("tr-TR")));
                 }
 
                 oEvent.getSource().getParent().setSelected(true);
@@ -314,6 +321,7 @@ sap.ui.define([
                 }
                 this._kalemDuzenle.open();
                 this._editedRowData = oEvent.getSource().getBindingContext("jsonModel").getObject();
+                this._editedRowData.Menge = parseFloat(this._editedRowData.Menge).toLocaleString("tr-TR")
                 this._jsonModel.setProperty("/EditedData", this._editedRowData);
 
                 this._getEditedStock(this._editedRowData);
@@ -323,9 +331,17 @@ sap.ui.define([
             },
 
             onKaydetButtonEditPress: function (oEvent) {
-                var deger1 = Number(this._editedRowData.Menge.replace(",", ".")).toFixed(2);
-                if (parseInt(deger1) > parseInt(this._jsonModel.getData().EditedDataStock)) {
-                    return MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ", this._jsonModel.getData().EditedDataStock))
+
+                if (this._editedRowData.Menge === "0") {
+                    return MessageToast.show(this.getResourceBundle().getText("MIKTAR_0_GIRILEMEZ"))
+                }
+
+                if (formatter.compareTwoStringAsFloat(this._editedRowData.Menge, this._jsonModel.getData().EditedDataStock, true)) {
+                    return MessageBox.error(this.getResourceBundle().getText("GIRILEN_MIKTAR_STOKTAN_BUYUK_OLAMAZ", formatter.convertStringToFloat(this._jsonModel.getData().EditedDataStock, true).toLocaleString("tr-TR")))
+                }
+
+                if (!this._jsonModel.getData().EditedDataStock) {
+                    return MessageBox.error(this.getResourceBundle().getText("STOK_BULUNAMADI"))
                 }
                 this._editRow(this._editedRowData);
             },
